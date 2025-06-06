@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine # Usamos a versão 16 do PostgreSQL, mais leve
+    restart: always           # Garante que o container reinicie se cair
+    environment:              # Variáveis de ambiente para configurar o PostgreSQL
+      POSTGRES_DB: hoteldb   # Nome do banco de dados
+      POSTGRES_USER: caleb # Nome do usuário do banco de dados
+      POSTGRES_PASSWORD: caleb28 # Senha do usuário
+    ports:                    # Mapeia a porta do container para a porta da sua máquina
+      - "5432:5432"           # Porta_Maquina:Porta_Container (5432 é a padrão do PostgreSQL)
+    volumes:                  # Persiste os dados do banco de dados
+      - db_data:/var/lib/postgresql/data # Volume nomeado para guardar os dados
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Script para criar tabelas
+
+volumes:
+  db_data: # Define o volume nomeado para os dados do banco
