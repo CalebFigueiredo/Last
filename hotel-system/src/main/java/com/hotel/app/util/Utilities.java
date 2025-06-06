@@ -97,7 +97,7 @@ public final class Utilities {
      * @param checkoutDateStr A data de check-out como string.
      * @return true se as datas forem válidas e seguirem a lógica, false caso contrário.
      */
-    public static boolean isValidCheckinCheckoutDatesFormat(String checkinDateStr, String checkoutDateStr) {
+    public static boolean readCheckInAndCheckOut(String checkinDateStr, String checkoutDateStr) {
         if (!isNotNullOrEmpty(checkinDateStr) || !isNotNullOrEmpty(checkoutDateStr)) {
             return false;
         }
@@ -146,7 +146,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return O e-mail validado.
      */
-    public static String getValidEmail(String prompt) {
+    public static String readEmail(String prompt) { // Renomeado de getValidEmail
         String email;
         while (true) {
             System.out.print(prompt);
@@ -164,7 +164,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return A senha forte validada.
      */
-    public static String getValidStrongPassword(String prompt) {
+    public static String readPassword(String prompt) {
         String password;
         while (true) {
             System.out.print(prompt);
@@ -182,7 +182,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return O nome de pessoa validado.
      */
-    public static String getValidPersonName(String prompt) {
+    public static String readPersonName(String prompt) { // Renomeado de readName para maior clareza
         String name;
         while (true) {
             System.out.print(prompt);
@@ -200,7 +200,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return A string não vazia e validada.
      */
-    public static String getNonEmptyString(String prompt) {
+    public static String readNonEmptyString(String prompt) { // Renomeado de readStringNotEmpty
         String input;
         while (true) {
             System.out.print(prompt);
@@ -218,7 +218,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return A data de nascimento validada.
      */
-    public static String getValidBirthDate(String prompt) {
+    public static String readBirthDate(String prompt) { // Renomeado de readBirthdate
         String birthDateStr;
         while (true) {
             System.out.print(prompt + " (DD/MM/AAAA): ");
@@ -236,7 +236,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return O número de telefone validado.
      */
-    public static String getValidPhoneNumber(String prompt) {
+    public static String readPhoneNumber(String prompt) {
         String phoneNumber;
         while (true) {
             System.out.print(prompt);
@@ -254,7 +254,7 @@ public final class Utilities {
      * @param prompt A mensagem a ser exibida.
      * @return O valor de pagamento validado.
      */
-    public static double getValidPaymentAmount(String prompt) {
+    public static double readPaymentAmount(String prompt) { // Renomeado de readPayment
         double amount;
         while (true) {
             System.out.print(prompt);
@@ -270,17 +270,5 @@ public final class Utilities {
             }
         }
     }
-
-    /**
-     * Valida se o PIN de pagamento fornecido corresponde ao PIN de referência.
-     * Em cenários reais, o 'referencePin' seria obtido de forma segura (e.g., hash do DB).
-     * @param enteredPin O PIN digitado.
-     * @param referencePin O PIN esperado para comparação.
-     * @return true se os PINs coincidirem e não forem vazios, false caso contrário.
-     */
-    public static boolean validatePaymentPin(String enteredPin, String referencePin) {
-        return isNotNullOrEmpty(enteredPin) && enteredPin.equals(referencePin);
-    }
-
 
 }

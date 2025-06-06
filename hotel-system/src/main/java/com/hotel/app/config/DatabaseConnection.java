@@ -14,13 +14,13 @@ public class DatabaseConnection {
     private static final String DB_PASSWORD = "caleb28"; // Sua senha do PostgreSQL (ajuste se mudou)
 
     public static void main(String[] args) {
-        System.out.println("Attempting to connect to the database...");
+        System.out.println("Conectando ao banco de dados");
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            System.out.println("Connection to PostgreSQL successful!");
+            System.out.println("Conexão ao Postgres feita com sucesso!");
 
             // Exemplo: Consultar as tabelas para confirmar que existem
-            System.out.println("\nListing tables from 'hoteldb':");
+            System.out.println("\nListando Tabelas do banco: 'hoteldb':");
             try (Statement statement = connection.createStatement()) {
                 ResultSet resultSet = statement.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
                 while (resultSet.next()) {

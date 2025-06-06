@@ -2,10 +2,15 @@ package com.hotel.app.model;
 
 import java.time.LocalDate;
 
+
+/**
+ * Representa um usuário no sistema de gestão hoteleira.
+ * Inclui detalhes como informações de contato, credenciais de login e função no sistema.
+ */
 public class User {
 
 
-    private Long id;
+    private Integer userId;
     private String fullName;
     private String email;
     private String password;
@@ -13,7 +18,34 @@ public class User {
     private LocalDate birthday;
     private Role role;
 
-    public User(String fullName, String email, String password, String phone, LocalDate birthday, Role role){
+
+    /**
+     * @param userId userId do usuario no banco de dados
+     * @param email indica o email do usuario
+     * @param fullName Nome completo do usuario
+     * @param birthday data de nascimento
+     * @param password palavra passe
+     * @param phone numero de telefone
+     * @param role identifica a hierarquia do usuario: Administrador ou Cliente/Hóspede
+     *
+    */
+    // Construtor completo (com ID)
+
+    public User(Integer userId, String fullName, String email, String phone, LocalDate birthday, Role role, String password){
+        this.userId = userId;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.birthday = birthday;
+        this.role = role;
+    }
+
+    /**
+     * Construtor sem ID (útil para novos usuários onde o ID será gerado pelo DB)
+     * aqui serve para adicionar novos usuarios ao banco de dados, onde o Id será gerado automaticamente
+     */
+    public User(String fullName, String email,  String phone,  LocalDate birthday, Role role, String password){
         this.fullName= fullName;
         this.email = email;
         this.password = password;
@@ -22,8 +54,9 @@ public class User {
         this.role= role;
     }
 
-    public Long getId() {return id;}
-    public void setId(Long id) {this.id = id;}
+
+    public Integer  getUserId() {return userId;}
+    public void setUserId(Integer  userId) {this.userId = this.userId;}
 
     public String getFullName() {return fullName;}
     public void setFullName(String fullName) {this.fullName = fullName;}
@@ -42,4 +75,5 @@ public class User {
 
     public Role getRole() {return role;}
     public void setRole(Role role) {this.role = role;}
+
 }
