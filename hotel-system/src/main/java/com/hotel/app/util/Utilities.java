@@ -16,6 +16,12 @@ public final class Utilities {
     private static final Scanner scanner = new Scanner(System.in);
     private Utilities() {}
 
+    public static void cls(){
+        for (int i = 0; i < 50; i++)
+            System.out.println();
+
+    }
+
     /**
      * Valida se uma string corresponde a um formato de e-mail válido.
      * @param email A string a ser validada.

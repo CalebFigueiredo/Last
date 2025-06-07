@@ -1,14 +1,15 @@
 package com.hotel.app.view;
 
 import com.hotel.app.util.Utilities;
+import com.hotel.app.model.Role;
 
 import java.util.Scanner;
 
 
 public class MainMenu {
+    public static final Scanner scanner = new Scanner(System.in);
 
     public static void mainMenu(){
-        Scanner scanner = new Scanner(System.in);
 
         int option;
         boolean running = false;
@@ -58,5 +59,37 @@ public class MainMenu {
     public static void login(){
 
     }
-    public static void regist(){}
+    public static void regist(){
+
+        String fullName, email, password, confirmPassword;
+        Role role;
+
+        boolean running = false;
+        while (!running){
+            try {
+                System.out.println("Insere seus dados!");
+                fullName = Utilities.readPersonName("Nome Completo: ");
+
+                email = Utilities.readEmail("Email: ");
+
+                repeatPassword:
+                password = Utilities.readPassword("Password: ");
+                confirmPassword = Utilities.readPassword("Confirmar password: ");
+
+                if (!confirmPassword.equals(password)){
+                    running = false;
+                    Utilities.cls();
+                    System.out.println("A password deve ser a mesma");
+                }
+
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+    }
 }

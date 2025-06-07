@@ -1,79 +1,111 @@
 package com.hotel.app.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
 
+
+import java.time.LocalDate;
 
 /**
  * Representa um usuário no sistema de gestão hoteleira.
- * Inclui detalhes como informações de contato, credenciais de login e função no sistema.
+ * Anotado com JPA para mapeamento para a tabela 'users' no banco de dados.
  */
+@Entity
+@Table(name = "users")
 public class User {
 
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Integer userId;
+
+    @Column(name = "fullname", nullable = false)
     private String fullName;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    private String password;
+
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
+
+    @Column(name = "birthday", nullable = false)
     private LocalDate birthday;
+
+    @Enumerated(EnumType.STRING) // Armazena o enum como String no DB
+    @Column(name = "role", nullable = false)
     private Role role;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    public User() {}
 
     /**
-     * @param userId userId do usuario no banco de dados
-     * @param email indica o email do usuario
-     * @param fullName Nome completo do usuario
-     * @param birthday data de nascimento
-     * @param password palavra passe
-     * @param phone numero de telefone
-     * @param role identifica a hierarquia do usuario: Administrador ou Cliente/Hóspede
+     * Construtor completo para criar um objeto User com um ID existente (útil ao recuperar do DB).
      *
-    */
-    // Construtor completo (com ID)
-
+     * @param userId O ID único do usuário.
+     * @param fullName O nome completo do usuário.
+     * @param email O endereço de e-mail do usuário.
+     * @param phone O número de telefone do usuário.
+     * @param birthday A data de nascimento do usuário.
+     * @param role A função do usuário no sistema.
+     * @param password A senha do usuário.
+     */
     public User(Integer userId, String fullName, String email, String phone, LocalDate birthday, Role role, String password){
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
-        this.password = password;
         this.phone = phone;
         this.birthday = birthday;
         this.role = role;
+        this.password = password;
     }
 
     /**
-     * Construtor sem ID (útil para novos usuários onde o ID será gerado pelo DB)
-     * aqui serve para adicionar novos usuarios ao banco de dados, onde o Id será gerado automaticamente
+     * Construtor para criar um novo objeto User sem um ID (o ID será gerado pelo DB).
+     *
+     * @param fullName O nome completo do usuário.
+     * @param email O endereço de e-mail do usuário.
+     * @param phone O número de telefone do usuário.
+     * @param birthday A data de nascimento do usuário.
+     * @param role A função do usuário no sistema.
+     * @param password A senha do usuário.
      */
-    public User(String fullName, String email,  String phone,  LocalDate birthday, Role role, String password){
-        this.fullName= fullName;
+    public User(String fullName, String email, String phone, LocalDate birthday, Role role, String password){
+        this.fullName = fullName;
         this.email = email;
-        this.password = password;
         this.phone = phone;
         this.birthday = birthday;
-        this.role= role;
+        this.role = role;
+        this.password = password;
     }
 
-
-    public Integer  getUserId() {return userId;}
-    public void setUserId(Integer  userId) {this.userId = this.userId;}
-
+    // --- Getters ---
+    public Integer getUserId() {return userId;}
     public String getFullName() {return fullName;}
-    public void setFullName(String fullName) {this.fullName = fullName;}
-
     public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
-
+    public String getPhone() {return phone;}
+    public LocalDate getBirthday() {return birthday;}
+    public Role getRole() {return role;}
     public String getPassword() {return password;}
+
+    // --- Setters ---
+    public void setUserId(Integer userId) {this.userId = userId;}
+    public void setFullName(String fullName) {this.fullName = fullName;}
+    public void setEmail(String email) {this.email = email;}
+    public void setPhone(String phone) {this.phone = phone;}
+    public void setBirthday(LocalDate birthday) {this.birthday = birthday;}
+    public void setRole(Role role) {this.role = role;}
     public void setPassword(String password) {this.password = password;}
 
-    public String getPhone() {return phone;}
-    public void setPhone(String phone) {this.phone = phone;}
-
-    public LocalDate getBirthday() {return birthday;}
-    public void setBirthday(LocalDate birthday) {this.birthday = birthday;}
-
-    public Role getRole() {return role;}
-    public void setRole(Role role) {this.role = role;}
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", fullName='" + fullName + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", birthday=" + birthday +
+                ", role=" + role +
+                '}';
+    }
 }

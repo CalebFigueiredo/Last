@@ -1,8 +1,6 @@
 package com.hotel.app.main;
 
-import com.hotel.app.config.DatabaseConnection; // Importa a classe de conexão
-//import com.hotel.app.dao.UserDAO;             // IMPORTANTE: Importa a classe UserDAO
-//import com.hotel.app.model.User;             // IMPORTANTE: Importa a classe User
+import com.hotel.app.config.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.SQLException;
