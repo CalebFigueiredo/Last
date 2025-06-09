@@ -23,6 +23,7 @@ public class HotelSystemApp {
             RoomService roomService = new RoomService(entityManager);
             BookingService bookingService = new BookingService(entityManager);
 
+
             System.out.println("Aplicação HotelSystemApp iniciada.");
 
             MainMenu.start(userService, roomService, bookingService, entityManager);

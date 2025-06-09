@@ -9,7 +9,7 @@ import com.hotel.app.util.Utilities;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter; // Esta importação pode ser removida se não for mais usada no MainMenu
 import java.util.Scanner;
 
 public class MainMenu {
@@ -23,19 +23,18 @@ public class MainMenu {
     private static ClientMenu clientMenu; // Instância para o menu do cliente
     private static AdminMenu adminMenu;   // Instância para o menu do administrador
 
-    public static void start(UserService uService, RoomService rService, BookingService bService, EntityManager em) {
+    public static void start(UserService uService, RoomService rService, BookingService bService, EntityManager entityManager) {
         userService = uService;
         roomService = rService;
         bookingService = bService;
-        sharedEntityManager = em;
+        sharedEntityManager = entityManager;
 
         // Inicializa as instâncias dos menus específicos, passando as dependências
         clientMenu = new ClientMenu(userService, roomService, bookingService, sharedEntityManager);
-        adminMenu = new AdminMenu(userService, roomService, bookingService, sharedEntityManager);
+        MainMenu.adminMenu = new AdminMenu(userService, roomService, bookingService, entityManager);
 
         boolean running = true;
         while (running) {
-            Utilities.cls(); // Limpa o console para uma apresentação limpa
 
             // Mensagens mais amigáveis e claras
             System.out.println("\n========== BEM-VINDO AO HOTEL A-DE-5-ESTRELAS ==========");
@@ -75,26 +74,21 @@ public class MainMenu {
             }
         }
         scanner.close();
-        Utilities.cls(); // Limpa o console ao sair
     }
 
     // --- MÉTODOS DE CADASTRO E LOGIN ---
 
     private static void registerCustomer() {
-        Utilities.cls();
         System.out.println("\n--- Junte-se à Família A-DE-5-ESTRELAS! ---");
         System.out.println("Por favor, preencha seus dados para criar sua conta.");
 
         String fullName = Utilities.readPersonName("Nome completo: ");
+
         String email = Utilities.readEmail("Email: ");
+
         String phone = Utilities.readPhoneNumber("Telefone (ex: 9XXXXXXXX): ");
-        // String birthdayStr = Utilities.readBirthDate("Data de Nascimento: (dd/MM/YYYY)");
-        //   LocalDate birthday = LocalDate.parse(birthdayStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        //temporario
-        String birthdayStr = "13/02/2003";
-        LocalDate birthday = LocalDate.parse(birthdayStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
+        LocalDate birthday = Utilities.readBirthDate("Data de Nascimento");
 
         String password = Utilities.readPassword("Crie sua senha: ");
         String confirmPassword = Utilities.readPassword("Confirme sua senha: ");
@@ -105,10 +99,10 @@ public class MainMenu {
             confirmPassword = Utilities.readPassword("Confirme sua senha: ");
         }
 
-        Role role;
 
         try {
-            User registeredUser = userService.registerUser(fullName, email, phone, birthday, password, role);
+            User registeredUser = userService.registerUser(fullName, email, phone, birthday, password, Role.GUEST);
+
             if (registeredUser != null) {
                 System.out.println("\nParabéns, " + registeredUser.getFullName() + "! Seu cadastro foi um sucesso!");
                 System.out.println("Agora você pode aproveitar todos os nossos serviços.");
@@ -119,13 +113,13 @@ public class MainMenu {
             }
         } catch (Exception e) {
             System.err.println("Ocorreu um erro inesperado durante o cadastro: " + e.getMessage());
-            // e.printStackTrace(); // Manter para depuração durante o desenvolvimento
+            e.printStackTrace(); // Manter para depuração durante o desenvolvimento
             Utilities.readNonEmptyString("Pressione Enter para voltar ao Menu Principal...");
         }
     }
 
+    // ... (restante do código do MainMenu, incluindo customerLogin e adminLogin)
     private static void customerLogin() {
-        Utilities.cls();
         System.out.println("\n--- Acesso Cliente A-DE-5-ESTRELAS ---");
         System.out.println("Por favor, insira suas credenciais.");
 
@@ -138,7 +132,7 @@ public class MainMenu {
             if (loggedInUser.getRole() == Role.GUEST) {
                 System.out.println("\nBem-vindo(a) de volta, " + loggedInUser.getFullName() + "!");
                 Utilities.readNonEmptyString("Pressione Enter para acessar seu menu exclusivo...");
-                clientMenu.startClientMenu(loggedInUser); // Redireciona para o ClientMenu
+                clientMenu.startClientMenu(loggedInUser);
             } else {
                 System.out.println("\nSuas credenciais são válidas, mas seu perfil não é de Cliente.");
                 System.out.println("Por favor, utilize a opção de login apropriada.");
@@ -152,7 +146,6 @@ public class MainMenu {
 
 
     private static void adminLogin() {
-        Utilities.cls();
         System.out.println("\n--- Acesso Restrito: Painel Administrativo ---");
         System.out.println("Por favor, insira suas credenciais de administrador.");
 

@@ -14,9 +14,6 @@ import java.util.List; // Adicionar para listar
 
 public class UserManagementMenu {
 
-    // Remover 'static' desses atributos para injeção de dependência via construtor,
-    // a menos que você tenha uma boa razão para que eles sejam estáticos e compartilhados globalmente.
-    // No contexto de um menu de instância, eles geralmente não deveriam ser estáticos.
     private UserService userService;
     private RoomService roomService;
     private BookingService bookingService;
@@ -24,7 +21,6 @@ public class UserManagementMenu {
 
 
     public UserManagementMenu(UserService uService, RoomService rService, BookingService bService, EntityManager em) {
-        // Usar 'this.' para atribuir aos campos da instância
         this.userService = uService;
         this.roomService = rService;
         this.bookingService = bService;
@@ -34,7 +30,6 @@ public class UserManagementMenu {
     public void startUserManagementMenu() {
         boolean managing = true;
         while (managing) {
-            Utilities.cls();
             System.out.println("\n--- GERENCIAMENTO DE USUÁRIOS ---");
             System.out.println("1. Listar Todos os Usuários");
             System.out.println("2. Buscar Usuário por Email");
@@ -57,7 +52,7 @@ public class UserManagementMenu {
                     addNewUser();
                     break;
                 case 4:
-                    updateUserData();
+                    updateUserData(); // Chamando o método atualizado
                     break;
                 case 5:
                     deleteUser();
@@ -75,23 +70,23 @@ public class UserManagementMenu {
 
 
     private void listAllUsers() {
-        Utilities.cls();
         System.out.println("\n--- LISTAR TODOS OS USUÁRIOS ---");
-        List<User> users = userService.getAllUsers(); // Supondo que você terá um método getAllUsers() no UserService
+        List<User> users = userService.getAllUsers();
 
         if (users.isEmpty()) {
             System.out.println("Nenhum usuário encontrado.");
         } else {
             System.out.println("--------------------------------------------------------------------------------------------------");
-            System.out.printf("%-5s %-25s %-25s %-15s %-15s\n", "ID", "Nome Completo", "Email", "Telefone", "Cargo");
+            System.out.printf("%-5s %-25s %-25s %-15s %-15s %-12s\n", "ID", "Nome Completo", "Email", "Telefone", "Cargo", "Aniversário");
             System.out.println("--------------------------------------------------------------------------------------------------");
             for (User user : users) {
-                System.out.printf("%-5d %-25s %-25s %-15s %-15s\n",
+                System.out.printf("%-5d %-25s %-25s %-15s %-15s %-12s\n",
                         user.getUserId(),
                         user.getFullName(),
                         user.getEmail(),
                         user.getPhone(),
-                        user.getRole());
+                        user.getRole(),
+                        user.getBirthday().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
             System.out.println("--------------------------------------------------------------------------------------------------");
         }
@@ -99,10 +94,9 @@ public class UserManagementMenu {
     }
 
     private void searchUserByEmail() {
-        Utilities.cls();
         System.out.println("\n--- BUSCAR USUÁRIO POR EMAIL ---");
         String email = Utilities.readNonEmptyString("Digite o email do usuário: ");
-        User user = userService.getUserByEmail(email); // Já havia corrigido no UserService antes para retornar User ou null
+        User user = userService.getUserByEmail(email);
 
         if (user != null) {
             System.out.println("\nUsuário Encontrado:");
@@ -119,18 +113,13 @@ public class UserManagementMenu {
     }
 
     private void addNewUser() {
-        Utilities.cls();
         System.out.println("\n--- ADICIONAR NOVO USUÁRIO ---");
         System.out.println("Por favor, preencha os dados do novo usuário.");
 
         String fullName = Utilities.readPersonName("Nome completo: ");
         String email = Utilities.readEmail("Email: ");
         String phone = Utilities.readPhoneNumber("Telefone (ex: 9XXXXXXXX): ");
-
-        // Temporário: Usar Utilities.readBirthDate quando estiver pronto
-        // Lembre-se que 'readBirthDate' do Utilities ainda precisa ser implementado para funcionar
-        String birthdayStr = "13/02/2003";
-        LocalDate birthday = LocalDate.parse(birthdayStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        LocalDate birthday = Utilities.readBirthDate("Data de Nascimento");
 
         String password = Utilities.readPassword("Crie a senha: ");
         String confirmPassword = Utilities.readPassword("Confirme a senha: ");
@@ -144,7 +133,6 @@ public class UserManagementMenu {
         Role userRole = selectUserRole();
 
         try {
-            // Passa a variável 'userRole' já preenchida
             User newUser = userService.registerUser(fullName, email, phone, birthday, password, userRole);
             if (newUser != null) {
                 System.out.println("\nUsuário " + newUser.getFullName() + " (" + newUser.getRole() + ") cadastrado com sucesso!");
@@ -176,17 +164,105 @@ public class UserManagementMenu {
         }
     }
 
+    // --- NOVO MÉTODO updateUserData() com Comparativo e Confirmação ---
     private void updateUserData() {
-        Utilities.cls();
         System.out.println("\n--- ATUALIZAR DADOS DO USUÁRIO ---");
-        System.out.println("Funcionalidade em desenvolvimento!");
+        String emailToUpdate = Utilities.readEmail("Digite o email do usuário que deseja atualizar: ");
+
+        User currentUser = userService.getUserByEmail(emailToUpdate);
+
+        if (currentUser == null) {
+            System.out.println("Usuário com o email '" + emailToUpdate + "' não encontrado.");
+            Utilities.readNonEmptyString("Pressione Enter para continuar...");
+            return;
+        }
+
+        System.out.println("\nUsuário encontrado. Por favor, insira os NOVOS dados para este usuário.");
+        System.out.println("As validações serão aplicadas ao final. Se não quiser alterar a senha, insira a senha atual.");
+
+        String newFullName = Utilities.readPersonName("Novo Nome completo: ");
+        String newEmail = Utilities.readEmail("Novo Email: ");
+        String newPhone = Utilities.readPhoneNumber("Novo Telefone (ex: 9XXXXXXXX): ");
+        LocalDate newBirthday = Utilities.readBirthDate("Nova Data de Nascimento");
+
+        String newPassword = Utilities.readPassword("Nova Senha (deve ser forte): ");
+        String confirmNewPassword = Utilities.readPassword("Confirme a nova senha: ");
+
+        while (!newPassword.equals(confirmNewPassword)) {
+            System.out.println("\nAs senhas não coincidem. Vamos tentar novamente.");
+            newPassword = Utilities.readPassword("Nova Senha (deve ser forte): ");
+            confirmNewPassword = Utilities.readPassword("Confirme a nova senha: ");
+        }
+
+        Role newRole = selectUserRole(); // Permite selecionar um novo cargo
+
+        System.out.println("\n--- REVISÃO DOS DADOS DO USUÁRIO ---");
+        System.out.println("------------------------------------------------------------------");
+        System.out.printf("%-20s %-30s %-30s\n", "Campo", "Valor Atual", "Novo Valor Proposto");
+        System.out.println("------------------------------------------------------------------");
+        System.out.printf("%-20s %-30s %-30s\n", "Nome Completo:", currentUser.getFullName(), newFullName);
+        System.out.printf("%-20s %-30s %-30s\n", "Email:", currentUser.getEmail(), newEmail);
+        System.out.printf("%-20s %-30s %-30s\n", "Telefone:", currentUser.getPhone(), newPhone);
+        System.out.printf("%-20s %-30s %-30s\n", "Data Nasc.:",
+                currentUser.getBirthday().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                newBirthday.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        System.out.printf("%-20s %-30s %-30s\n", "Senha:", "********", "********"); // Não exibir senhas
+        System.out.printf("%-20s %-30s %-30s\n", "Cargo:", currentUser.getRole(), newRole);
+        System.out.println("------------------------------------------------------------------");
+
+        String confirmation = Utilities.readNonEmptyString("\nConfirma a atualização com os novos dados? (SIM/NAO): ").trim().toUpperCase();
+
+        if (confirmation.equals("SIM")) {
+            try {
+                // Criar um novo objeto User com os novos dados para passar ao serviço
+                // ou atualizar o objeto currentUser diretamente com os novos valores.
+                // Vou optar por atualizar o currentUser para manter a referência original.
+                currentUser.setFullName(newFullName);
+                currentUser.setEmail(newEmail);
+                currentUser.setPhone(newPhone);
+                currentUser.setBirthday(newBirthday);
+                currentUser.setPassword(newPassword); // A senha já foi validada e confirmada
+                currentUser.setRole(newRole);
+
+                userService.updateUser(currentUser); // Assumindo que updateUser persiste as mudanças
+                System.out.println("\nDados do usuário " + currentUser.getFullName() + " atualizados com sucesso!");
+            } catch (Exception e) {
+                System.err.println("Erro ao atualizar usuário: " + e.getMessage());
+            }
+        } else {
+            System.out.println("\nAtualização cancelada.");
+        }
         Utilities.readNonEmptyString("Pressione Enter para continuar...");
     }
 
+
     private void deleteUser() {
-        Utilities.cls();
         System.out.println("\n--- REMOVER USUÁRIO ---");
-        System.out.println("Funcionalidade em desenvolvimento!");
+        String emailToDelete = Utilities.readEmail("Digite o email do usuário que deseja remover: ");
+
+        User userToDelete = userService.getUserByEmail(emailToDelete);
+
+        if (userToDelete == null) {
+            System.out.println("Usuário com o email '" + emailToDelete + "' não encontrado.");
+            Utilities.readNonEmptyString("Pressione Enter para continuar...");
+            return;
+        }
+
+        // Confirmação para evitar exclusões acidentais
+        System.out.println("\nVocê realmente deseja remover o usuário: " + userToDelete.getFullName() + " (" + userToDelete.getEmail() + ")?");
+        String confirmation = Utilities.readNonEmptyString("Digite 'SIM' para confirmar ou qualquer outra coisa para cancelar: ").trim().toUpperCase();
+
+        if (confirmation.equals("SIM")) {
+            try {
+
+                userService.deleteUser(userToDelete.getUserId());
+                System.out.println("\nUsuário " + userToDelete.getFullName() + " removido com sucesso!");
+            } catch (Exception e) {
+                System.err.println("Erro ao remover usuário: " + e.getMessage());
+            }
+        } else {
+            System.out.println("\nRemoção cancelada.");
+        }
         Utilities.readNonEmptyString("Pressione Enter para continuar...");
     }
 }

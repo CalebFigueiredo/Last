@@ -1,69 +1,81 @@
-// Exemplo de como seu RoomService.java deve ser
 package com.hotel.app.service;
 
+import com.hotel.app.dao.RoomDAO; // Certifique-se de ter essa classe no pacote 'dao'
 import com.hotel.app.model.Room;
+import com.hotel.app.model.RoomType;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
 public class RoomService {
 
-    private EntityManager entityManager;
+    private RoomDAO roomDAO;
 
     public RoomService(EntityManager entityManager) {
-        this.entityManager = entityManager;
+        this.roomDAO = new RoomDAO(entityManager);
     }
 
-    public Room createRoom(Room room) {
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(room);
-            entityManager.getTransaction().commit();
-            return room;
-        } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
-            System.err.println("Erro ao criar quarto: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Falha ao criar quarto.", e);
+    /**
+     * Adiciona um novo quarto ao sistema.
+     * @param roomNumber O número do quarto.
+     * @param roomType O tipo de quarto.
+     * @param pricePerNight O preço por noite.
+     * @param capacity A capacidade de pessoas.
+     * @param floor O andar do quarto.
+     * @param isAvailable Se o quarto está disponível.
+     * @return O objeto Room persistido, ou null se já existir um quarto com o mesmo número.
+     */
+    public Room addRoom(String roomNumber, RoomType roomType, double pricePerNight, int capacity, int floor, boolean isAvailable) {
+        // Opcional: Verifique se já existe um quarto com o mesmo número antes de adicionar
+        if (roomDAO.getRoomByNumber(roomNumber) != null) {
+            System.out.println("Erro: Já existe um quarto com o número " + roomNumber + ".");
+            return null;
         }
-    }
 
-    public Room getRoomById(Integer roomId) {
+        Room newRoom = new Room(roomNumber, roomType, pricePerNight, capacity, floor, isAvailable);
         try {
-            return entityManager.find(Room.class, roomId);
+            return roomDAO.addRoom(newRoom);
         } catch (Exception e) {
-            System.err.println("Erro ao buscar quarto por ID: " + e.getMessage());
+            System.err.println("Erro ao adicionar quarto: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<Room> getAllAvailableRooms() {
-        TypedQuery<Room> query = entityManager.createQuery(
-                "SELECT r FROM Room r WHERE r.isAvailable = TRUE", Room.class);
-        return query.getResultList();
+    /**
+     * Obtém um quarto pelo seu ID.
+     * @param id O ID do quarto.
+     * @return O objeto Room, ou null se não encontrado.
+     */
+    public Room getRoomById(Integer id) {
+        return roomDAO.getRoomById(id);
     }
 
-    public Room updateRoomAvailability(Integer roomId, boolean isAvailable) {
-        try {
-            entityManager.getTransaction().begin();
-            Room room = entityManager.find(Room.class, roomId);
-            if (room != null) {
-                room.setAvailable(isAvailable);
-                entityManager.merge(room);
-            }
-            entityManager.getTransaction().commit();
-            return room;
-        } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
-            System.err.println("Erro ao atualizar disponibilidade do quarto: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Falha ao atualizar disponibilidade do quarto.", e);
-        }
+    /**
+     * Obtém um quarto pelo seu número.
+     * @param roomNumber O número do quarto.
+     * @return O objeto Room, ou null se não encontrado.
+     */
+    public Room getRoomByNumber(String roomNumber) {
+        return roomDAO.getRoomByNumber(roomNumber);
+    }
+
+
+    /**
+     * Obtém uma lista de todos os quartos.
+     * @return Lista de todos os quartos.
+     */
+    public List<Room> getAllRooms() {
+        return roomDAO.getAllRooms();
+    }
+
+    // Métodos para atualizar e deletar (serão implementados depois)
+    public Room updateRoom(Room room) {
+        // Implementação em breve
+        return null;
+    }
+
+    public void deleteRoom(Integer roomId) {
+        // Implementação em breve
     }
 }

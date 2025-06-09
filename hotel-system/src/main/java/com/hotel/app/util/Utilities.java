@@ -14,25 +14,15 @@ import java.util.regex.Pattern;
 public final class Utilities {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private Utilities() {}
 
-    public static void cls() {
-        try {
-            final String os = System.getProperty("os.name");
-            if (os.contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                System.out.print("\033[H\033[2J"); // Sequência ANSI para limpar
-                System.out.flush();
-            }
-        } catch (final Exception e) {
-            // Em caso de erro (ex: terminal não suporta), não faz nada.
-            System.err.println("Não foi possível limpar o console: " + e.getMessage());
-        }
+    private Utilities() {
     }
+
+    // O método cls() foi removido daqui.
 
     /**
      * Solicita e valida um número inteiro do utilizador, repetindo até que um número válido seja inserido.
+     *
      * @param prompt A mensagem a ser exibida ao utilizador.
      * @return O número inteiro validado.
      */
@@ -51,6 +41,7 @@ public final class Utilities {
 
     /**
      * Valida se uma string corresponde a um formato de e-mail válido.
+     *
      * @param email A string a ser validada.
      * @return true se o e-mail for válido, false caso contrário.
      */
@@ -63,6 +54,7 @@ public final class Utilities {
     /**
      * Valida se uma string é uma senha forte, com critérios de tamanho (8-20),
      * letras maiúsculas/minúsculas, números e caracteres especiais.
+     *
      * @param password A senha a ser validada.
      * @return true se a senha for forte, false caso contrário.
      */
@@ -80,6 +72,7 @@ public final class Utilities {
     /**
      * Valida se uma string de nome contém apenas letras, espaços, acentuações e apóstrofos,
      * e tem no máximo 50 caracteres.
+     *
      * @param name O nome a ser validado.
      * @return true se o nome for válido, false caso contrário.
      */
@@ -95,6 +88,7 @@ public final class Utilities {
 
     /**
      * Verifica se uma string não é nula, vazia ou composta apenas por espaços em branco.
+     *
      * @param str A string a ser verificada.
      * @return true se a string tiver conteúdo, false caso contrário.
      */
@@ -103,17 +97,16 @@ public final class Utilities {
     }
 
 
-
-
     /**
      * Valida um par de strings de data de check-in e check-out (formato DD/MM/AAAA).
      * O check-in deve ser igual ou posterior à data atual, e o check-out deve ser
      * estritamente posterior ao check-in.
-     * @param checkinDateStr A data de check-in como string.
+     *
+     * @param checkinDateStr  A data de check-in como string.
      * @param checkoutDateStr A data de check-out como string.
      * @return true se as datas forem válidas e seguirem a lógica, false caso contrário.
      */
-    public static boolean readCheckInAndCheckOut(String checkinDateStr, String checkoutDateStr) {
+    public static boolean readCheckInAndCheckOut(String checkinDateStr, String checkoutDateStr) { // Este é um validador, não um leitor interativo
         if (!isNotNullOrEmpty(checkinDateStr) || !isNotNullOrEmpty(checkoutDateStr)) {
             return false;
         }
@@ -123,9 +116,13 @@ public final class Utilities {
             LocalDate checkinDate = LocalDate.parse(checkinDateStr, dateFormatter);
             LocalDate checkoutDate = LocalDate.parse(checkoutDateStr, dateFormatter);
 
+            // Correção para check-in: deve ser HOJE ou no futuro
             if (checkinDate.isBefore(LocalDate.now())) {
+                System.out.println("A data de Check-in não pode ser anterior à data atual.");
                 return false;
             }
+
+
             return checkoutDate.isAfter(checkinDate);
         } catch (DateTimeParseException e) {
             return false;
@@ -134,6 +131,7 @@ public final class Utilities {
 
     /**
      * Valida se uma string corresponde ao formato de número de telefone angolano (9 dígitos, começando com '9').
+     *
      * @param phoneNumber O número de telefone a ser validado.
      * @return true se o número for válido, false caso contrário.
      */
@@ -141,13 +139,14 @@ public final class Utilities {
         if (!isNotNullOrEmpty(phoneNumber)) {
             return false;
         }
-        String phoneRegex = "^9\\d{8}$"; // Formato angolano: 9 seguido de 8 dígitos
+        String phoneRegex = "^9\\d{8}$";
         Pattern pattern = Pattern.compile(phoneRegex);
         return pattern.matcher(phoneNumber).matches();
     }
 
     /**
      * Valida se um valor numérico é positivo.
+     *
      * @param amount O valor a ser validado.
      * @return true se o valor for maior que zero, false caso contrário.
      */
@@ -159,10 +158,11 @@ public final class Utilities {
 
     /**
      * Solicita e valida um e-mail do utilizador, repetindo até que um formato válido seja inserido.
+     *
      * @param prompt A mensagem a ser exibida.
      * @return O e-mail validado.
      */
-    public static String readEmail(String prompt) { // Renomeado de getValidEmail
+    public static String readEmail(String prompt) {
         String email;
         while (true) {
             System.out.print(prompt);
@@ -177,6 +177,7 @@ public final class Utilities {
 
     /**
      * Solicita e valida uma senha forte do utilizador, repetindo até que seja válida.
+     *
      * @param prompt A mensagem a ser exibida.
      * @return A senha forte validada.
      */
@@ -195,10 +196,11 @@ public final class Utilities {
 
     /**
      * Solicita e valida um nome de pessoa, repetindo até que seja válido.
+     *
      * @param prompt A mensagem a ser exibida.
      * @return O nome de pessoa validado.
      */
-    public static String readPersonName(String prompt) { // Renomeado de readName para maior clareza
+    public static String readPersonName(String prompt) {
         String name;
         while (true) {
             System.out.print(prompt);
@@ -213,10 +215,12 @@ public final class Utilities {
 
     /**
      * Solicita uma string e repete até que ela não seja nula ou vazia.
+     *
      * @param prompt A mensagem a ser exibida.
      * @return A string não vazia e validada.
      */
-    public static String readNonEmptyString(String prompt) { // Renomeado de readStringNotEmpty
+
+    public static String readNonEmptyString(String prompt) {
         String input;
         while (true) {
             System.out.print(prompt);
@@ -228,60 +232,11 @@ public final class Utilities {
             }
         }
     }
-/*
-    /**
-     * Solicita e valida uma data de nascimento, repetindo até que seja válida (formato DD/MM/AAAA e no passado).
-     * @param prompt A mensagem a ser exibida.
-     * @return A data de nascimento validada.
-     */
-  /*  public static String readBirthDate(String prompt) { // Renomeado de readBirthdate
-        String birthDateStr;
-        while (true) {
-            System.out.print(prompt + " (DD/MM/AAAA): ");
-            birthDateStr = scanner.nextLine();
-            if (isValidBirthDateFormat(birthDateStr)) {
-                return birthDateStr;
-            } else {
-                System.out.println("Data de nascimento inválida. Deve estar no formato DD/MM/AAAA e ser uma data passada. Tente novamente.");
-            }
-        }
-    }
-
-    /**
-     * Valida se uma string representa uma data de nascimento válida (formato DD/MM/AAAA)
-     * e se a data está no passado.
-     * @param birthDateStr A data de nascimento como string.
-     * @return true se a data for válida e passada, false caso contrário.
-     */
-    // Lê uma data de nascimento, valida formato e se é uma data passada
-  /*  public static String readBirthDate(String prompt) {
-        String dateStr;
-        LocalDate birthDate;
-        do {
-            System.out.print(prompt);
-            dateStr = scanner.nextLine().trim();
-            if (dateStr.isEmpty()) {
-                System.out.println("A data de nascimento não pode ser vazia. Por favor, preencha-a.");
-                continue; // Pede novamente sem tentar parsear
-            }
-            try {
-                birthDate = LocalDate.parse(dateStr);
-                if (birthDate.isAfter(LocalDate.now())) {
-                    System.out.println("Data de nascimento inválida. Não pode ser uma data futura. Tente novamente.");
-                } else {
-                    return dateStr; // Retorna a string se for válida
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("Formato de data inválido. Por favor, use DD/MM/AAAA. Tente novamente.");
-            }
-        } while (true); // Loop infinito até que uma data válida seja retornada
-
-    }
-    */
 
 
     /**
      * Solicita e valida um número de telefone, repetindo até que seja válido (formato angolano).
+     *
      * @param prompt A mensagem a ser exibida.
      * @return O número de telefone validado.
      */
@@ -300,10 +255,11 @@ public final class Utilities {
 
     /**
      * Solicita e valida um valor de pagamento, repetindo até que seja um número positivo.
+     *
      * @param prompt A mensagem a ser exibida.
      * @return O valor de pagamento validado.
      */
-    public static double readPaymentAmount(String prompt) { // Renomeado de readPayment
+    public static double readPaymentAmount(String prompt) {
         double amount;
         while (true) {
             System.out.print(prompt);
@@ -316,6 +272,78 @@ public final class Utilities {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Entrada inválida. Por favor, insira um número.");
+            }
+        }
+    }
+
+
+    /**
+     * Lê uma data de nascimento do utilizador, validando o formato (DD/MM/YYYY) e a lógica (idade).
+     * Repete a solicitação até que uma data válida seja fornecida.
+     *
+     * @param prompt Mensagem a ser exibida ao utilizador (ex: "Data de Nascimento").
+     * @return A data de nascimento validada como um objeto LocalDate.
+     */
+    //Por melhorar
+    /**
+     * Lê uma data de nascimento do utilizador, validando o formato (DD/MM/YYYY) e a lógica (idade).
+     * Repete a solicitação até que uma data válida seja fornecida.
+     *
+     * @param prompt Mensagem a ser exibida ao utilizador (ex: "Data de Nascimento").
+     * @return A data de nascimento validada como um objeto LocalDate.
+     */
+    public static LocalDate readBirthDate(String prompt) {
+        // Usa ResolverStyle.STRICT para evitar datas inválidas como 30/02
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withResolverStyle(ResolverStyle.STRICT);
+        LocalDate birthDate;
+        while (true) {
+            String dateString = readNonEmptyString(prompt + " (DD/MM/YYYY): ");
+            try {
+                birthDate = LocalDate.parse(dateString, formatter);
+
+                LocalDate today = LocalDate.now();
+                // Idade mínima de 18 anos
+                LocalDate minAgeDate = today.minusYears(18);
+                // Idade máxima de 120 anos (para evitar datas absurdas)
+                LocalDate maxAgeDate = today.minusYears(120);
+
+                // A data de nascimento deve ser antes ou igual à data que representa 18 anos atrás
+                // E deve ser depois ou igual à data que representa 120 anos atrás
+                if (birthDate.isAfter(minAgeDate)) {
+                    System.out.println("Data de nascimento inválida. O usuário deve ter pelo menos 18 anos de idade.");
+                } else if (birthDate.isBefore(maxAgeDate)) {
+                    System.out.println("Data de nascimento inválida. O usuário não pode ser tão velho (limite de 120 anos).");
+                } else {
+                    return birthDate; // Data válida
+                }
+            } catch (DateTimeParseException e) {
+                // Esta exceção é capturada se o formato não for dd/MM/yyyy ou se a data for inválida (ex: 31/02/2024)
+                System.out.println("Formato de data inválido ou data inexistente. Por favor, use o formato DD/MM/YYYY (ex: 09/06/2000).");
+            }
+        }
+    }
+
+
+    /**
+     * Solicita e valida um número decimal (double) do utilizador, repetindo até que seja um número válido.
+     * Permite o uso de vírgula ou ponto como separador decimal.
+     * @param prompt A mensagem a ser exibida ao utilizador.
+     * @return O valor double validado.
+     */
+    public static double readDoubleInput(String prompt) {
+        double number;
+        while (true) {
+            System.out.print(prompt);
+            try {
+                String input = scanner.nextLine().replace(",", "."); // Aceita vírgula ou ponto
+                if (input.trim().isEmpty()) {
+                    System.out.println("Este campo não pode ser vazio. Por favor, preencha-o.");
+                    continue;
+                }
+                number = Double.parseDouble(input);
+                return number;
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Por favor, insira um número decimal válido.");
             }
         }
     }

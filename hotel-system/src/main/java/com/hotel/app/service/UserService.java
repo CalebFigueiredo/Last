@@ -33,16 +33,13 @@ public class UserService {
             System.out.println("Erro: Já existe um usuário cadastrado com este e-mail.");
             return null;
         }
-        // Você pode adicionar uma verificação de telefone aqui também se quiser
-        // if (userDAO.getUserByPhone(phone) != null) { ... }
+        //  adicionar uma verificação de telefone aqui também
+         //if (userDAO.getUserByPhone(phone) != null) { ... }
 
-        // Cria uma nova instância de User com os dados fornecidos, incluindo o Role
         User newUser = new User(fullName, email, phone, birthday, role, password);
 
         try {
-            // Adiciona o novo usuário via DAO e retorna a instância persistida
-            // É CRUCIAL que userDAO.addUser(newUser) retorne o objeto User APÓS a persistência,
-            // contendo o ID gerado pelo banco de dados.
+
             User persistedUser = userDAO.addUser(newUser);
             if (persistedUser != null) {
                 System.out.println("Usuário " + persistedUser.getFullName() + " cadastrado com sucesso! ID: " + persistedUser.getUserId());
@@ -99,19 +96,19 @@ public class UserService {
         return userDAO.getUserByEmail(email);
     }
 
-    /*
+    /**
      * Atualiza os dados de um usuário existente.
      * @param user O objeto User com os dados atualizados.
      * @return O objeto User atualizado, ou null em caso de falha.
+    */
     public User updateUser(User user) {
         try {
-            return userDAO.updateUser(user); // Assumindo que você tem um método updateUser no UserDAO
+            return userDAO.updateUser(user);
         } catch (Exception e) {
             System.err.println("Erro ao atualizar usuário: " + e.getMessage());
             return null;
         }
     }
-    */
 
     /**
      * Deleta um usuário pelo seu ID.
@@ -119,7 +116,7 @@ public class UserService {
      */
     public void deleteUser(Integer userId) {
         try {
-            userDAO.deleteUser(userId); // Assumindo que você tem um método deleteUser no UserDAO
+            userDAO.deleteUser(userId);
             System.out.println("Usuário com ID " + userId + " deletado com sucesso.");
         } catch (Exception e) {
             System.err.println("Erro ao deletar usuário: " + e.getMessage());

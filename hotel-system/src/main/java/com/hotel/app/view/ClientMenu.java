@@ -37,7 +37,6 @@ public class ClientMenu {
     public void startClientMenu(User currentUser) {
         boolean customerRunning = true;
         while (customerRunning) {
-            Utilities.cls();
             System.out.println("\n======= SEU ESPAÇO NO HOTEL A-DE-5-ESTRELAS =======");
             System.out.println("        Bem-vindo(a), " + currentUser.getFullName() + "!");
             System.out.println("--------------------------------------------------");
@@ -213,7 +212,6 @@ public class ClientMenu {
     }
 
     private void viewProfile(User user) {
-        Utilities.cls();
         System.out.println("\n--- Seu Perfil de Cliente ---");
         System.out.println("Aqui estão seus dados cadastrais:");
         System.out.println("---------------------------------");
@@ -227,7 +225,6 @@ public class ClientMenu {
     }
 
     private void listClientBookings(User currentUser) {
-        Utilities.cls();
         System.out.println("\n--- Seu Histórico de Reservas ---");
         System.out.println("Verifique suas reservas passadas e futuras aqui.");
         List<Booking> clientBookings = bookingService.listClientBookings(currentUser);
