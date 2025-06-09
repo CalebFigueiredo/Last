@@ -9,11 +9,13 @@
 
         <class>com.hotel.app.model.User</class>
         <class>com.hotel.app.model.Room</class>
+        <class>com.hotel.app.model.Booking</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/hoteldb"/>
             <property name="jakarta.persistence.jdbc.user" value="caleb"/>
             <property name="jakarta.persistence.jdbc.password" value="caleb28"/>
+
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>

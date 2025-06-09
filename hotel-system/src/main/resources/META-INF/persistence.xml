@@ -9,6 +9,7 @@
 
         <class>com.hotel.app.model.User</class>
         <class>com.hotel.app.model.Room</class>
+        <class>com.hotel.app.model.Booking</class>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/hoteldb"/>

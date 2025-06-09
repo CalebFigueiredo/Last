@@ -1,46 +1,44 @@
 package com.hotel.app;
 
-import com.hotel.app.dao.RoomDAO;
-import com.hotel.app.dao.UserDAO;
+import com.hotel.app.service.BookingService;
+import com.hotel.app.service.RoomService;
 import com.hotel.app.service.UserService;
-import com.hotel.app.util.JpaUtil;
 import com.hotel.app.view.MainMenu;
-
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 public class HotelSystemApp {
-
     public static void main(String[] args) {
-        JpaUtil.init(); // Inicializa o EntityManagerFactory
-        System.out.println("Aplicação HotelSystemApp iniciada.");
-
+        EntityManagerFactory entityManagerFactory = null;
         EntityManager entityManager = null;
 
         try {
-            entityManager = JpaUtil.getEntityManager();
+            entityManagerFactory = Persistence.createEntityManagerFactory("hotel_management_unit");
+            entityManager = entityManagerFactory.createEntityManager();
 
-            UserDAO userDAO = new UserDAO(entityManager);
-            RoomDAO roomDAO = new RoomDAO(entityManager);
+            System.out.println("EntityManagerFactory inicializado com sucesso.");
 
-            UserService userService = new UserService(userDAO);
-            // Futuramente, você terá: BookingService bookingService = new BookingService(bookingDAO, userDAO, roomDAO);
+            UserService userService = new UserService(entityManager);
+            RoomService roomService = new RoomService(entityManager);
+            BookingService bookingService = new BookingService(entityManager);
 
-            MainMenu.start(userService, roomDAO, entityManager);
+            System.out.println("Aplicação HotelSystemApp iniciada.");
 
+            MainMenu.start(userService, roomService, bookingService, entityManager);
 
         } catch (Exception e) {
-            // Em um Main, o rollback aqui pode ser para um caso excepcional não tratado nos menus.
-            // A maioria das transações será gerenciada DENTRO dos métodos do MainMenu ou Services.
-            if (entityManager != null && entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-            }
-            System.err.println("Ocorreu um erro inesperado na aplicação: " + e.getMessage());
+            System.out.println("Erro fatal na inicialização da aplicação: " + e.getMessage());
             e.printStackTrace();
         } finally {
             if (entityManager != null && entityManager.isOpen()) {
                 entityManager.close();
+                System.out.println("EntityManager fechado.");
             }
-            JpaUtil.close(); // Fecha o EntityManagerFactory
+            if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+                entityManagerFactory.close();
+                System.out.println("EntityManagerFactory fechado.");
+            }
             System.out.println("Aplicação HotelSystemApp encerrada e recursos JPA liberados.");
         }
     }

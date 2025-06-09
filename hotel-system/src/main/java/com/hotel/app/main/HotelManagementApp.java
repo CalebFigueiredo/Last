@@ -1,4 +1,5 @@
-package com.hotel.app.main;
+ /*
+ package com.hotel.app.main;
 
 import com.hotel.app.config.DatabaseConnection;
 
@@ -26,3 +27,5 @@ public class HotelManagementApp {
         System.out.println("Sistema encerrado.");
     }
 }
+
+ * */

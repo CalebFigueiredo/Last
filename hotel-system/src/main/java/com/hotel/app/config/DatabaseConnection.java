@@ -29,7 +29,7 @@ public class DatabaseConnection {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error connecting to the database or executing query:");
+            System.out.println("Error connecting to the database or executing query:");
             e.printStackTrace();
 
         }

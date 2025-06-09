@@ -16,10 +16,37 @@ public final class Utilities {
     private static final Scanner scanner = new Scanner(System.in);
     private Utilities() {}
 
-    public static void cls(){
-        for (int i = 0; i < 50; i++)
-            System.out.println();
+    public static void cls() {
+        try {
+            final String os = System.getProperty("os.name");
+            if (os.contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J"); // Sequência ANSI para limpar
+                System.out.flush();
+            }
+        } catch (final Exception e) {
+            // Em caso de erro (ex: terminal não suporta), não faz nada.
+            System.err.println("Não foi possível limpar o console: " + e.getMessage());
+        }
+    }
 
+    /**
+     * Solicita e valida um número inteiro do utilizador, repetindo até que um número válido seja inserido.
+     * @param prompt A mensagem a ser exibida ao utilizador.
+     * @return O número inteiro validado.
+     */
+    public static int readIntInput(String prompt) {
+        int number;
+        while (true) {
+            System.out.print(prompt);
+            try {
+                number = Integer.parseInt(scanner.nextLine().trim());
+                return number;
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Por favor, insira um número inteiro válido.");
+            }
+        }
     }
 
     /**
@@ -75,25 +102,8 @@ public final class Utilities {
         return str != null && !str.trim().isEmpty();
     }
 
-    /**
-     * Valida se uma string representa uma data de nascimento válida (formato DD/MM/AAAA)
-     * e se a data está no passado.
-     * @param birthDateStr A data de nascimento como string.
-     * @return true se a data for válida e passada, false caso contrário.
-     */
-    public static boolean isValidBirthDateFormat(String birthDateStr) {
-        if (!isNotNullOrEmpty(birthDateStr)) {
-            return false;
-        }
-        try {
-            LocalDate birthDate = LocalDate.parse(birthDateStr,
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy").withResolverStyle(ResolverStyle.STRICT));
-            // A data deve ser estritamente anterior à data atual
-            return birthDate.isBefore(LocalDate.now());
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-    }
+
+
 
     /**
      * Valida um par de strings de data de check-in e check-out (formato DD/MM/AAAA).
@@ -218,13 +228,13 @@ public final class Utilities {
             }
         }
     }
-
+/*
     /**
      * Solicita e valida uma data de nascimento, repetindo até que seja válida (formato DD/MM/AAAA e no passado).
      * @param prompt A mensagem a ser exibida.
      * @return A data de nascimento validada.
      */
-    public static String readBirthDate(String prompt) { // Renomeado de readBirthdate
+  /*  public static String readBirthDate(String prompt) { // Renomeado de readBirthdate
         String birthDateStr;
         while (true) {
             System.out.print(prompt + " (DD/MM/AAAA): ");
@@ -236,6 +246,39 @@ public final class Utilities {
             }
         }
     }
+
+    /**
+     * Valida se uma string representa uma data de nascimento válida (formato DD/MM/AAAA)
+     * e se a data está no passado.
+     * @param birthDateStr A data de nascimento como string.
+     * @return true se a data for válida e passada, false caso contrário.
+     */
+    // Lê uma data de nascimento, valida formato e se é uma data passada
+  /*  public static String readBirthDate(String prompt) {
+        String dateStr;
+        LocalDate birthDate;
+        do {
+            System.out.print(prompt);
+            dateStr = scanner.nextLine().trim();
+            if (dateStr.isEmpty()) {
+                System.out.println("A data de nascimento não pode ser vazia. Por favor, preencha-a.");
+                continue; // Pede novamente sem tentar parsear
+            }
+            try {
+                birthDate = LocalDate.parse(dateStr);
+                if (birthDate.isAfter(LocalDate.now())) {
+                    System.out.println("Data de nascimento inválida. Não pode ser uma data futura. Tente novamente.");
+                } else {
+                    return dateStr; // Retorna a string se for válida
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato de data inválido. Por favor, use DD/MM/AAAA. Tente novamente.");
+            }
+        } while (true); // Loop infinito até que uma data válida seja retornada
+
+    }
+    */
+
 
     /**
      * Solicita e valida um número de telefone, repetindo até que seja válido (formato angolano).

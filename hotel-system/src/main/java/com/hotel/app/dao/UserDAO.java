@@ -5,6 +5,7 @@ import com.hotel.app.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.EntityTransaction; // Importe EntityTransaction se for gerenciar transações aqui
 
 import java.util.List;
 
@@ -12,7 +13,6 @@ public class UserDAO {
 
     private EntityManager entityManager;
 
-    // Construtor para injetar o EntityManager
     public UserDAO(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
@@ -20,13 +20,30 @@ public class UserDAO {
     /**
      * Adiciona um novo usuário ao banco de dados.
      * O ID do usuário será gerado pelo banco de dados e atualizado no objeto User após a persistência.
-     * A transação é gerenciada externamente.
      *
      * @param user O objeto User a ser adicionado.
+     * @return O objeto User persistido, com o ID gerado pelo banco de dados. Retorna null em caso de erro.
      */
-    public void addUser(User user) {
-        entityManager.persist(user);
-        System.out.println("Usuário adicionado com sucesso! ID: " + user.getUserId());
+    public User addUser(User user) {
+        EntityTransaction transaction = null;
+        try {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            entityManager.persist(user);
+            entityManager.flush();
+
+            transaction.commit();
+            System.out.println("Usuário adicionado com sucesso! ID: " + user.getUserId());
+            return user;
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.err.println("Erro ao adicionar usuário ao banco de dados: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -53,22 +70,34 @@ public class UserDAO {
      * @return Uma {@link List} de objetos {@link User}. Pode ser vazia se não houver usuários.
      */
     public List<User> getAllUsers() {
-        TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u", User.class);
-        return query.getResultList();
+        // Para operações de leitura, geralmente não é necessário uma transação explícita
+        // a menos que você precise de um nível específico de isolamento ou controle transacional.
+        // Se o EntityManager estiver gerenciado no contexto da sessão, pode funcionar sem begin/commit.
+        return entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 
     /**
      * Atualiza as informações de um utilizador existente no banco de dados.
-     * A transação é gerenciada externamente.
      *
      * @param user O objeto {@link User} com as informações atualizadas.
-     * @return true se o utilizador foi atualizado, false caso contrário.
+     * @return O objeto User atualizado, ou null em caso de falha.
      */
-    public boolean updateUser(User user) {
-        // O método merge retorna a entidade gerenciada, que pode ser uma cópia do que foi passado.
-        // É importante usar o retorno para futuras operações nesta transação.
-        entityManager.merge(user);
-        return true; // Supondo que merge sempre retorna true se sem exceção
+    public User updateUser(User user) { // ALTERADO: Retorna User
+        EntityTransaction transaction = null;
+        try {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+            User mergedUser = entityManager.merge(user); // O método merge retorna a entidade gerenciada
+            transaction.commit();
+            return mergedUser; // Retorna o objeto User atualizado
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.err.println("Erro ao atualizar usuário no banco de dados: " + e.getMessage());
+            e.printStackTrace();
+            return null; // Retorna null em caso de falha
+        }
     }
 
 
@@ -90,17 +119,31 @@ public class UserDAO {
 
     /**
      * Deleta um usuário do banco de dados pelo seu ID.
-     * A transação é gerenciada externamente.
      *
      * @param userId O ID do usuário a ser deletado.
      * @return true se o usuário foi deletado, false caso contrário.
      */
     public boolean deleteUser(Integer userId) {
-        User user = entityManager.find(User.class, userId);
-        if (user != null) {
-            entityManager.remove(user);
-            return true;
+        EntityTransaction transaction = null;
+        try {
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+            User user = entityManager.find(User.class, userId);
+            if (user != null) {
+                entityManager.remove(user);
+                transaction.commit();
+                return true;
+            } else {
+                transaction.rollback(); // Nao encontrou, nao faz sentido commitar
+                return false;
+            }
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.err.println("Erro ao deletar usuário do banco de dados: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 }
